@@ -30,8 +30,8 @@ message CustomerResponse {
 }
 
 service RegistrationService {
-    rpc CreateCustomer (CustomerRequest) returns (Customer);
-    rpc FindCustomer (CustomerRequest) returns (Customer);
-    rpc DeleteCustomer (Customer) returns (Customer);
+    rpc CreateCustomer (CustomerRequest) returns (CustomerResponse);
+    rpc FindCustomer (CustomerRequest) returns (CustomerResponse);
+    rpc DeleteCustomer (Customer) returns (CustomerResponse);
 }
 
