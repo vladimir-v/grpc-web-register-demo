@@ -21,7 +21,7 @@ func removeIndex(slice []*Customer, i int) []*Customer {
 func (s *Server) CreateCustomer(ctx context.Context, r *CustomerRequest) (*CustomerResponse, error) {
 	now, err := ptypes.TimestampProto(time.Now().UTC())
 	if err != nil {
-		return _, err
+		return nil, err
 	}
 	resp, ct := &CustomerResponse{},
 		&Customer{
@@ -33,7 +33,6 @@ func (s *Server) CreateCustomer(ctx context.Context, r *CustomerRequest) (*Custo
 
 	// Save Customer in memory - demo
 	s.Customers = append(s.Customers, ct)
-
 	return resp, nil
 }
 
@@ -45,7 +44,7 @@ func (s *Server) FindCustomer(ctx context.Context, r *CustomerRequest) (*Custome
 			return resp, nil
 		}
 	}
-	return _, errors.New("Customer not found")
+	return nil, errors.New("Customer not found")
 }
 
 func (s *Server) DeleteCustomer(ctx context.Context, r *Customer) (*CustomerResponse, error) {
@@ -53,9 +52,9 @@ func (s *Server) DeleteCustomer(ctx context.Context, r *Customer) (*CustomerResp
 		if customer.Id == r.GetId() {
 			resp := &CustomerResponse{}
 			resp.Customer = removeIndex(resp.Customer, idx)
-			return resp, _
+			return resp, nil
 		}
 	}
-	return _, errors.New("Customer not found")
+	return nil, errors.New("Customer not found")
 }
 
