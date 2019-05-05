@@ -3,28 +3,31 @@ package register
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
-	. "github.com/vladimir-v/grpc-web-register-demo/proto/gen"
-	"time"
+	"github.com/vladimir-v/grpc-web-register-demo/proto/gen"
 )
 
+// Server implements registration service interface
 type Server struct {
-	Customers []*Customer
+	Customers []*register.Customer
 }
 
-func removeIndex(slice []*Customer, i int) []*Customer {
+func removeIndex(slice []*register.Customer, i int) []*register.Customer {
 	copy(slice[i:], slice[i+1:])
 	return slice[:len(slice)-1]
 }
 
-func (s *Server) CreateCustomer(ctx context.Context, r *CustomerRequest) (*CustomerResponse, error) {
+// CreateCustomer method create a new customer
+func (s *Server) CreateCustomer(ctx context.Context, r *register.CustomerRequest) (*register.CustomerResponse, error) {
 	now, err := ptypes.TimestampProto(time.Now().UTC())
 	if err != nil {
 		return nil, err
 	}
-	resp, ct := &CustomerResponse{},
-		&Customer{
+	resp, ct := &register.CustomerResponse{},
+		&register.Customer{
 			Id:        uuid.New().String(),
 			Name:      r.GetName(),
 			Age:       r.GetAge(),
@@ -36,10 +39,10 @@ func (s *Server) CreateCustomer(ctx context.Context, r *CustomerRequest) (*Custo
 	return resp, nil
 }
 
-func (s *Server) FindCustomer(ctx context.Context, r *CustomerRequest) (*CustomerResponse, error) {
+func (s *Server) FindCustomer(ctx context.Context, r *register.CustomerRequest) (*register.CustomerResponse, error) {
 	for _, customer := range s.Customers {
 		if customer.Id == r.GetId() {
-			resp := &CustomerResponse{}
+			resp := &register.CustomerResponse{}
 			resp.Customer = append(resp.Customer, customer)
 			return resp, nil
 		}
@@ -47,14 +50,13 @@ func (s *Server) FindCustomer(ctx context.Context, r *CustomerRequest) (*Custome
 	return nil, errors.New("Customer not found")
 }
 
-func (s *Server) DeleteCustomer(ctx context.Context, r *Customer) (*CustomerResponse, error) {
+func (s *Server) DeleteCustomer(ctx context.Context, r *register.Customer) (*register.CustomerResponse, error) {
 	for idx, customer := range s.Customers {
 		if customer.Id == r.GetId() {
-			resp := &CustomerResponse{}
+			resp := &register.CustomerResponse{}
 			resp.Customer = removeIndex(resp.Customer, idx)
 			return resp, nil
 		}
 	}
 	return nil, errors.New("Customer not found")
 }
-
